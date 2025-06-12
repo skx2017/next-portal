@@ -4,16 +4,14 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --background-rgb: 255, 255, 255;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+html, body, #__next {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
 body {
@@ -24,6 +22,99 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+}
+
+/* 基础响应式设置 */
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+#__next {
+  height: 100%;
+}
+
+/* 标准屏幕适配 (1366px - 1919px) */
+@media screen and (min-width: 1366px) and (max-width: 1919px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+/* 设计稿尺寸适配 (1920px) */
+@media screen and (min-width: 1920px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* 响应式容器 */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  max-width: 100%;
+}
+
+@media (min-width: 1366px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .container {
+    max-width: 1920px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+/* 响应式字体大小类 */
+.text-responsive {
+  font-size: clamp(0.875rem, 1vw, 1rem);
+}
+
+.heading-responsive {
+  font-size: clamp(1.25rem, 1.5vw, 1.5rem);
+}
+
+/* 响应式间距 */
+.space-responsive {
+  padding: clamp(1.5rem, 2vw, 2rem);
+  margin: clamp(1.5rem, 2vw, 2rem);
+}
+
+/* 响应式网格布局 */
+.grid-responsive {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 500px), 1fr));
+  gap: clamp(1.5rem, 2vw, 2rem);
+}
+
+/* 响应式图片 */
+.img-responsive {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* 响应式按钮 */
+.btn-responsive {
+  padding: clamp(0.75rem, 1vw, 1rem) clamp(1.5rem, 2vw, 2rem);
+  font-size: clamp(0.875rem, 1vw, 1rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
 }
 
 @layer utilities {

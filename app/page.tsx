@@ -1,113 +1,137 @@
-import Image from "next/image";
+"use client";
+import { useState, Suspense } from "react";
+import Link from "next/link";
+import dynamic from "next/dynamic";
+import NewsFeedServer from "@/components/NewsFeedServer";
+
+const NewsFeedClient = dynamic(() => import("@/components/NewsFeedClient"), { ssr: false });
+
+// 假数据
+const newsData = {
+  推荐: [],
+  订阅: [],
+  政策: [],
+};
 
 export default function Home() {
+  const [tab, setTab] = useState<"推荐" | "订阅" | "政策">("推荐");
+  const [initialData, setInitialData] = useState<any[]>(newsData[tab]); // 先用假数据，后续可用接口
+
+  // Tab 切换时，initialData 只在首次加载时用，后续由 NewsFeedClient 自己请求
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className="min-h-screen  flex flex-col">
+      <div className="flex-1 flex items-center justify-center overflow-x-hidden">
+        <div className="w-[80vw] max-w-[1920px] mx-auto h-[90vh] flex flex-col lg:flex-row gap-4 overflow-x-hidden">
+          {/* 主内容区 */}
+          <div className="flex-1 flex flex-col bg-white rounded-2xl shadow p-8 h-full min-h-0">
+            {/* 顶部搜索栏 */}
+            <h1 className="text-2xl font-bold text-center mb-6 mt-2 text-[#181c32]">请问需要什么帮助?</h1>
+            <div className="w-full flex justify-center mb-8">
+              <input
+                type="text"
+                placeholder="请输入进行全文检索"
+                className="w-[480px] rounded-full px-6 py-2 border border-[#e5e7eb] focus:outline-none focus:ring-2 focus:ring-indigo-200 bg-[#f6f7fb]"
+              />
+              <button className="ml-2 px-6 py-2 rounded-full bg-[#7c83f5] text-white font-semibold">搜索</button>
+            </div>
+            {/* Tab */}
+            <div className="flex border-b border-[#e5e7eb] mb-4">
+              {["推荐", "订阅", "政策"].map((t) => (
+                <button
+                  key={t}
+                  className={`px-6 py-2 font-semibold ${
+                    tab === t
+                      ? "text-[#7c83f5] border-b-2 border-[#7c83f5] bg-white rounded-t-lg"
+                      : "text-gray-500"
+                  }`}
+                  onClick={() => setTab(t as "推荐" | "订阅" | "政策")}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+            {/* 新闻流混合渲染 */}
+            <div className="flex-1 min-h-0">
+              <NewsFeedClient tab={tab} initialData={initialData} />
+            </div>
+            {/* 页脚 */}
+            <div className="text-center text-xs text-gray-400 mt-8">
+              用户协议 | 隐私政策 | 关于我们 | 公网安备 浙ICP备2021039909号-1 | 版权所有 ©2023 深佳科技 zjsjkj.cn
+            </div>
+          </div>
+          {/* 右侧卡片区 */}
+          <div className="w-full lg:w-[340px] flex flex-col gap-6 h-full min-w-0">
+            {/* 登录卡片（建议CSR） */}
+            <Suspense fallback={<div className="bg-white rounded-2xl shadow p-6">加载中...</div>}>
+              {/* 这里可以用一个 LoginCard 组件，建议用 'use client' */}
+              <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-center">
+                <div className="w-14 h-14 bg-gray-200 rounded-full flex items-center justify-center mb-2">
+                  <span className="text-3xl text-gray-400">👤</span>
+                </div>
+                <div className="font-semibold mb-2">立即登录</div>
+                <div className="text-xs text-gray-400 mb-4">定制科研兴趣圈&回答学术影响力</div>
+                <button className="px-4 py-1 rounded bg-[#7c83f5] text-white text-sm mb-4">添加关注</button>
+                <div className="flex justify-between w-full text-xs text-gray-500">
+                  <div className="flex flex-col items-center flex-1">
+                    <span>关注领域</span>
+                    <span className="font-bold text-[#181c32]">--</span>
+                  </div>
+                  <div className="flex flex-col items-center flex-1">
+                    <span>关注公众号</span>
+                    <span className="font-bold text-[#181c32]">--</span>
+                  </div>
+                  <div className="flex flex-col items-center flex-1">
+                    <span>知友数</span>
+                    <span className="font-bold text-[#181c32]">--</span>
+                  </div>
+                  <div className="flex flex-col items-center flex-1">
+                    <span>标签数</span>
+                    <span className="font-bold text-[#181c32]">--</span>
+                  </div>
+                </div>
+              </div>
+            </Suspense>
+            {/* 设备卡片 */}
+            <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-center">
+              <div className="w-24 h-24 bg-gray-100 rounded flex items-center justify-center mb-2">
+                <span className="text-5xl text-gray-200">📦</span>
+              </div>
+              <div className="text-gray-400 mt-2">暂无绑定的硬件设备</div>
+            </div>
+            {/* 数据统计卡片（建议SSR） */}
+            <div className="bg-white rounded-2xl shadow p-6">
+              <div className="font-semibold mb-4">数据统计</div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col items-center bg-[#f8f9ff] rounded-lg p-2">
+                  <span className="text-[#7c83f5] text-xl font-bold flex items-center gap-1">
+                    <span className="material-icons text-base">folder</span>260
+                  </span>
+                  <span className="text-xs text-gray-500">领域标签数</span>
+                </div>
+                <div className="flex flex-col items-center bg-[#f8f9ff] rounded-lg p-2">
+                  <span className="text-[#7c83f5] text-xl font-bold flex items-center gap-1">
+                    <span className="material-icons text-base">folder</span>20854
+                  </span>
+                  <span className="text-xs text-gray-500">公域知识数量</span>
+                </div>
+                <div className="flex flex-col items-center bg-[#f8f9ff] rounded-lg p-2">
+                  <span className="text-[#7c83f5] text-xl font-bold flex items-center gap-1">
+                    <span className="material-icons text-base">folder</span>121
+                  </span>
+                  <span className="text-xs text-gray-500">自媒体数量</span>
+                </div>
+                <div className="flex flex-col items-center bg-[#f8f9ff] rounded-lg p-2">
+                  <span className="text-[#7c83f5] text-xl font-bold flex items-center gap-1">
+                    <span className="material-icons text-base">folder</span>9
+                  </span>
+                  <span className="text-xs text-gray-500">创作应用数量</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </div>
   );
 }
